@@ -1,0 +1,26 @@
+version: "3"
+services:
+  log-ingestor:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+     - ./:/app
+     - /app/node_modules 
+    environment:
+      - PORT=3000
+      - MONGO_USER=utsav
+      - MONGO_PASSWORD=password
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=utsav
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo-db:/data/db
+
+volumes:
+  mongo-db:
