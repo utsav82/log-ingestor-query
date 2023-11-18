@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Query Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Log Query Form</h1>
+    <form action="/log" method="GET">
+        <div style="list-style: none;">
+            <li>
+                <label for="level">Level:</label>
+                <input type="text" id="level" name="level">
+            </li>
+            <li><label for="message">Message:</label>
+                <input type="text" id="message" name="message">
+            </li>
+            <li> <label for="resourceId">Resource ID:</label>
+                <input type="text" id="resourceId" name="resourceId">
+            </li>
+            <li> <label for="timestamp">Timestamp:</label>
+                <input type="text" id="timestamp" name="timestamp">
+            </li>
+            <li> <label for="traceId">Trace ID:</label>
+                <input type="text" id="traceId" name="traceId">
+            </li>
+            <li> <label for="spanId">Span ID:</label>
+                <input type="text" id="spanId" name="spanId">
+            </li>
+            <li> <label for="commit">Commit:</label>
+                <input type="text" id="commit" name="commit">
+            </li>
+            <li> <label for="parentResourceId">Parent Resource ID:</label>
+                <input type="text" id="parentResourceId" name="parentResourceId">
+            </li>
+          <li>  <button type="submit">Submit Query</button></li>
+        </div>
+    </form>
+</body>
+
+</html>
