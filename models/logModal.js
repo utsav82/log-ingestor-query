@@ -3,15 +3,12 @@ const mongoose = require("mongoose");
 const logSchema = new mongoose.Schema({
   level: {
     type: String,
-    required: [true, "Log must have a level"],
   },
   message: {
     type: String,
-    required: [true, "Log must have a message"],
   },
   resourceId: {
     type: String,
-    required: [true, "Log must have a resourceId"],
   },
   timestamp: {
     type: Date,

@@ -3,7 +3,7 @@ const logsController = require("../controllers/logController");
 const router = express.Router();
 router
   .route("/")
-  .get(logsController.getAllLogs)
+  .get(logsController.getLogs)
   .post(logsController.createLog);
 
 module.exports = router;
