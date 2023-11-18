@@ -1,4 +1,5 @@
 const Log = require("../models/logModal");
+const { publishToQueue } = require("../utils/messageQueue");
 
 exports.getAllLogs = async (req, res, next) => {
   try {
@@ -18,22 +19,16 @@ exports.getAllLogs = async (req, res, next) => {
   }
 };
 
-
 exports.createLog = async (req, res, next) => {
   try {
-    const log = await Log.create(req.body);
+    const logEntry = req.body;
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        log,
-      },
-    });
+    await publishToQueue(logEntry);
+
+    res
+      .status(200)
+      .json({ message: "Log entry received and queued for processing" });
   } catch (e) {
-    console.log(e);
-    res.status(400).json({
-      status: "fail",
-    });
+    res.status(400).json({ message: e.message });
   }
 };
-

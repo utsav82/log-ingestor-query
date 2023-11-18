@@ -13,6 +13,7 @@ services:
       - MONGO_PASSWORD=password
     depends_on:
       - mongo
+      - rabbitmq
 
   mongo:
     image: mongo
@@ -21,6 +22,9 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
       - mongo-db:/data/db
+
+  rabbitmq:
+    image: rabbitmq:latest
 
 volumes:
   mongo-db:
