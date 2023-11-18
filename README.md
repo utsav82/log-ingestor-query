@@ -7,20 +7,12 @@ This project implements a log ingestor system and a query interface. The system 
 - [Features](#features)
   - [Log Ingestor](#log-ingestor)
   - [Query Interface](#query-interface)
-- [Advanced Features (Bonus)](#advanced-features-bonus)
-- [Sample Queries](#sample-queries)
-- [Evaluation Criteria](#evaluation-criteria)
-- [Submission](#submission)
-- [Tips](#tips)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
   - [Log Ingestor](#log-ingestor-usage)
   - [Query Interface](#query-interface-usage)
-- [Advanced Configurations](#advanced-configurations)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
