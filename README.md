@@ -4,47 +4,67 @@ This project implements a log ingestor system and a query interface. The system 
 
 ## Table of Contents
 
-- [Features](#features)
+- [Log Ingestor and Query Interface](#log-ingestor-and-query-interface)
   - [Log Ingestor](#log-ingestor)
   - [Query Interface](#query-interface)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-- [Usage](#usage)
-  - [Log Ingestor](#log-ingestor-usage)
-  - [Query Interface](#query-interface-usage)
-- [Project Setup](#project-setup)
-  - [Prerequisites](#prerequisites-1)
-  - [Installation](#installation-1)
-- [Contribution Guidelines](#contribution-guidelines)
-- [License](#license)
+- [Limitations and Known Issues](#limitations-and-known-issues)
 
-## Features
 
-### Log Ingestor
-
-- Ingest logs in the provided JSON format.
-- Scalable design to handle high volumes of logs.
-- Mitigate potential bottlenecks, such as I/O operations and database write speeds.
-- Log ingestion via an HTTP server running on port `3000` by default.
-
-### Query Interface
-
-- User interface (Web UI or CLI) for full-text search across logs.
-- Filters based on:
-  - level
-  - message
-  - resourceId
-  - timestamp
-  - traceId
-  - spanId
-  - commit
-  - metadata.parentResourceId
-- Efficient and quick search results.
 
 # Log Ingestor and Query Interface
 
 This project implements a log ingestor and a query interface in Node.js using an Express server.
+
+## Components and Technologies Used
+
+### Log Ingestor
+
+- **Node.js and Express Server:**
+  - Handles incoming requests and manages responses.
+  
+- **RabbitMQ Message Queue:**
+  - Logs are forwarded to a message queue upon receipt.
+  - A subscriber consumes these logs and writes them to the database.
+
+- **MongoDB (Sharded):**
+  - Efficiently manages vast amounts of log data.
+  - Sharded MongoDB with 3 config servers and 2 shards for scalability.
+  - Timestamps are indexed to optimize write performance.
+
+### Load Balancing
+
+- **Nginx:**
+  - Load balances multiple Node.js servers to handle requests at scale.
+  - Distributes incoming requests to different instances of the Node.js app.
+
+## Query Interface Usage
+
+
+### Using HTML Form
+
+Access the HTML form at [http://localhost:3000/](http://localhost:3000/) to conveniently input queries and retrieve results.
+
+### Using GET Requests
+
+Make GET requests to [http://localhost:3000/log](http://localhost:3000/log) with appropriate parameters to query the log data. You can use tools like Postman or Thunder Client for this purpose.
+
+Example GET request parameters:
+
+- `http://localhost:3000/log?level=error`
+- `http://localhost:3000/log?message=Failed%20to%20connect`
+- `http://localhost:3000/log?resourceId=server-1234`
+
+Adjust the parameters based on the specific log attributes you want to filter or search.
+
+### Docker and Docker Compose
+
+- **Containerization:**
+  - Docker is used to manage different images and containers.
+  - Docker Compose simplifies multi-container Docker applications.
+
 
 ## Components and Technologies Used
 
@@ -84,14 +104,12 @@ This project implements a log ingestor and a query interface in Node.js using an
 
 ### Prerequisites
 
-- Node.js (version X.X.X)
-- npm (version X.X.X)
-- Docker (version X.X.X)
-- Docker Compose (version X.X.X)
-- RabbitMQ
-- MongoDB (Sharded)
+- Docker
 
-### Installation
+
+## Installation
+
+To run the log ingestor and query interface, you need Docker installed on your system. If you don't have Docker installed, follow the instructions provided [here](https://docs.docker.com/get-docker/) to install Docker for your operating system.
 
 1. **Clone the repository:**
     ```bash
@@ -99,31 +117,74 @@ This project implements a log ingestor and a query interface in Node.js using an
     cd log-ingestor
     ```
 
-2. **Install dependencies:**
+2. **Start the containers:**
     ```bash
-    npm install
+    docker-compose up -d --scale log-ingestor=2
     ```
 
-3. **Run the application:**
+   This command starts all the necessary containers. The `-d` flag runs the containers in the background, and `--scale log-ingestor=2` scales the log-ingestor service to two instances.
+
+3. **Wait for the containers to be ready:**
+    While the containers are starting up, the Node.js app connects to the database and RabbitMQ. You can verify their status by checking the logs using Docker Desktop or running the following command for each instance:
     ```bash
-    docker-compose up
+    docker logs -f log-ingestor-query-log-ingestor-1
     ```
 
-## Usage
+    Replace `1` with `2` for the second instance.
 
-- Access the log ingestor at [http://localhost:3000](http://localhost:3000).
-- The query interface is available at [http://localhost:3000/log](http://localhost:3000/log).
+4. **Interact with the System:**
 
-## Contribution Guidelines
+   - **HTTP Requests:**
+     - Make HTTP POST requests to the `/log` endpoint to submit logs.
+     - Use HTTP GET requests at the same endpoint with various query parameters to retrieve logs.
+     - Example GET request: `http://localhost:3000/log?level=error`
+     - Experiment with different query parameters based on log attributes.
 
-Contributions are welcome! Follow these steps:
+   - **Web UI:**
+     - Access the web UI at [http://localhost:3000](http://localhost:3000) in your browser.
+     - Enter log details for queries in the user-friendly interface.
 
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
+5. **Stopping and Cleaning Up**
+    
+    To stop and bring down the Docker containers, you can use the following command:
 
-## License
+    ```bash
+    docker-compose down
+    ```
+    This command stops and removes the containers. If you want to also delete the volumes and remove all data stored in the database, you can use the -v flag:
 
-This project is licensed under the [MIT License](LICENSE).
+    Caution: The -v flag deletes volumes, including the MongoDB data. Use this flag only if you want to start fresh and don't need to preserve any data in the database.
+
+## Limitations and Known Issues
+
+### Sharding Configuration
+
+- The sharding setup is currently automated through a pre-configured MongoDB image by bitnami for simplicity and time efficiency.
+
+### Container Startup Dependencies
+
+- There might be instances where the Node.js container starts before the RabbitMQ or MongoDB containers are fully up. In such cases, the Node.js app may encounter connection issues.
+  
+- **Mitigation:**
+  - Proper error handling is implemented, and the Node.js app will retry connecting to the containers until they are ready.
+  - Users are advised to wait for the containers to be up before interacting with the system. Check container logs for status verification:
+  
+    ```bash
+    docker logs -f log-ingestor-query-log-ingestor-1
+    ```
+    Replace `1` with `2` for the second instance.
+
+### Initial Request Delay
+
+- In some cases, the first request to the server might experience an unexpected delay.
+  
+- **Mitigation:**
+  - Subsequent requests work smoothly. Currently I am investigating the issue but it does not seem to happen so often.
+
+## Troubleshooting
+
+If you encounter any issues or have questions, consider the following steps:
+
+1. Check container logs for any error messages.
+2. Ensure all required containers (RabbitMQ, MongoDB) are running and fully initialized.
+
