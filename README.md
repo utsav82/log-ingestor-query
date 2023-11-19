@@ -12,8 +12,6 @@ This project implements a log ingestor system and a query interface. The system 
   - [Installation](#installation)
 - [Limitations and Known Issues](#limitations-and-known-issues)
 
-
-
 # Log Ingestor and Query Interface
 
 This project implements a log ingestor and a query interface in Node.js using an Express server.
@@ -92,7 +90,6 @@ Adjust the parameters based on the specific log attributes you want to filter or
 
 - **HTML Form:**
   - Implemented at `localhost:3000/` for user-friendly interaction.
-  - Handles POST and GET requests at `/log`.
 
 ### Docker and Docker Compose
 
@@ -132,6 +129,8 @@ To run the log ingestor and query interface, you need Docker installed on your s
 
     Replace `1` with `2` for the second instance.
 
+    ![image](public/terminal.png)
+
 4. **Interact with the System:**
 
    - **HTTP Requests:**
@@ -140,9 +139,15 @@ To run the log ingestor and query interface, you need Docker installed on your s
      - Example GET request: `http://localhost:3000/log?level=error`
      - Experiment with different query parameters based on log attributes.
 
+   ![image](public/post.png)
+   ![image](public/get.png)
+
    - **Web UI:**
      - Access the web UI at [http://localhost:3000](http://localhost:3000) in your browser.
      - Enter log details for queries in the user-friendly interface.
+
+        ![image](public/browser.png)
+        ![image](public/browser2.png)
 
 5. **Stopping and Cleaning Up**
     
@@ -168,7 +173,7 @@ To run the log ingestor and query interface, you need Docker installed on your s
 - **Mitigation:**
   - Proper error handling is implemented, and the Node.js app will retry connecting to the containers until they are ready.
   - Users are advised to wait for the containers to be up before interacting with the system. Check container logs for status verification:
-  
+
     ```bash
     docker logs -f log-ingestor-query-log-ingestor-1
     ```
