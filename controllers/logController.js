@@ -43,8 +43,6 @@ exports.getLogs = async (req, res, next) => {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            width: 100vw;
           }
   
           h1 {

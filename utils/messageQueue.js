@@ -2,11 +2,39 @@ const amqp = require("amqplib");
 const rabbitmqUrl = "amqp://rabbitmq:5672";
 const queueName = "logQueue";
 const Log = require("../models/logModal");
-const { set } = require("mongoose");
+const maxRetryTime = 30000; // 30 seconds in milliseconds
+let startTime;
+
+// connect with connectWithRetry
 let rabbitmqConnection;
 let rabbitmqChannel;
 
-// connect with connectWithRetry
+// Function to establish RabbitMQ connection
+async function connectToRabbitMQ() {
+  try {
+    rabbitmqConnection = await amqp.connect(rabbitmqUrl);
+    rabbitmqChannel = await rabbitmqConnection.createChannel();
+    await rabbitmqChannel.assertQueue(queueName, { durable: false });
+    console.log("Connected to RabbitMQ");
+    console.log("Waiting for log entries...");
+
+    consumeFromQueue();
+  } catch (error) {
+    if (!startTime) {
+      startTime = Date.now();
+    }
+
+    const elapsedTime = Date.now() - startTime;
+
+    if (elapsedTime < maxRetryTime) {
+    } else {
+      console.error(
+        `Unable to connect to RabbitMQ ${error.message} , retrying....`
+      );
+    }
+    setTimeout(connectToRabbitMQ, 5000);
+  }
+}
 
 async function publishToQueue(logEntry) {
   try {
@@ -23,14 +51,6 @@ async function publishToQueue(logEntry) {
 
 async function consumeFromQueue() {
   try {
-    // Ensure RabbitMQ connection is established
-    rabbitmqConnection = await amqp.connect(rabbitmqUrl);
-    rabbitmqChannel = await rabbitmqConnection.createChannel();
-    await rabbitmqChannel.assertQueue(queueName, { durable: false });
-    console.log("Connected to RabbitMQ");
-    console.log("Waiting for log entries...");
-
-    // Continuous loop to listen for messages
     rabbitmqChannel.consume(
       queueName,
       async (message) => {
@@ -43,11 +63,10 @@ async function consumeFromQueue() {
       { noAck: true }
     );
   } catch (error) {
-    console.error(`Trying to reconnect to RabbitMQ: ${error.message}`);
-    setTimeout(consumeFromQueue, 5000);
-
+    console.error(`Error consuming from queue: ${error.message}`);
   }
 }
 
 exports.publishToQueue = publishToQueue;
 exports.consumeFromQueue = consumeFromQueue;
+exports.connectToRabbitMQ = connectToRabbitMQ;

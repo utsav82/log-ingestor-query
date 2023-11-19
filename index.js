@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const logsRouter = require("./routes/logsRouter");
 const { connectWithRetry } = require("./utils/mongoose");
-const { consumeFromQueue } = require("./utils/messageQueue");
+const { connectToRabbitMQ } = require("./utils/messageQueue");
 
 connectWithRetry();
 const app = express();
@@ -14,8 +14,9 @@ app.get("/", (req, res) => {
   console.log("GET /");
 });
 app.use("/log", logsRouter);
+
 // Start consuming log entries from the message queue
-consumeFromQueue();
+connectToRabbitMQ();
 
 const port = process.env.PORT || 3000;
 
