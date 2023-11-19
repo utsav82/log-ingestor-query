@@ -13,6 +13,11 @@ This project implements a log ingestor system and a query interface. The system 
 - [Usage](#usage)
   - [Log Ingestor](#log-ingestor-usage)
   - [Query Interface](#query-interface-usage)
+- [Project Setup](#project-setup)
+  - [Prerequisites](#prerequisites-1)
+  - [Installation](#installation-1)
+- [Contribution Guidelines](#contribution-guidelines)
+- [License](#license)
 
 ## Features
 
@@ -122,5 +127,3 @@ Contributions are welcome! Follow these steps:
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-
