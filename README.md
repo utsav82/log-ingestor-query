@@ -7,7 +7,7 @@ This project implements a log ingestor system and a query interface. The system 
 - [Log Ingestor and Query Interface](#log-ingestor-and-query-interface)
   - [Log Ingestor](#log-ingestor)
   - [Query Interface](#query-interface)
-- [Getting Started](#getting-started)
+- [Getting Started](#project-setup)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Limitations and Known Issues](#limitations-and-known-issues)
@@ -111,7 +111,7 @@ To run the log ingestor and query interface, you need Docker installed on your s
 1. **Clone the repository:**
     ```bash
     git clone https://github.com/your-username/log-ingestor.git
-    cd log-ingestor
+    cd log-ingestor-query
     ```
 
 2. **Start the containers:**
