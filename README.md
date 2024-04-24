@@ -1,4 +1,4 @@
-# Log Ingestor and Query Interface
+# LogScope
 
 This project implements a log ingestor system and a query interface. The system efficiently handles vast volumes of log data and provides a simple interface for querying data using full-text search or specific field filters.
 
