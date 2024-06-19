@@ -25,16 +25,22 @@ async function connectToRabbitMQ() {
     const elapsedTime = Date.now() - startTime;
 
     if (elapsedTime < maxRetryTime) {
+      console.log("Trying to connect to RabbitMQ");
       setTimeout(connectToRabbitMQ, 5000);
     } else {
-      console.error(`Unable to connect to RabbitMQ after ${maxRetryTime / 1000} seconds: ${error.message}`);
+      console.error(
+        `Unable to connect to RabbitMQ after ${maxRetryTime / 1000} seconds: ${
+          error.message
+        }`
+      );
     }
   }
 }
 
 async function publishToQueue(logEntry) {
   try {
-    if (!rabbitmqChannel) throw new Error("RabbitMQ channel is not established.");
+    if (!rabbitmqChannel)
+      throw new Error("RabbitMQ channel is not established.");
     rabbitmqChannel.sendToQueue(
       queueName,
       Buffer.from(JSON.stringify(logEntry))
@@ -47,7 +53,8 @@ async function publishToQueue(logEntry) {
 
 async function consumeFromQueue() {
   try {
-    if (!rabbitmqChannel) throw new Error("RabbitMQ channel is not established.");
+    if (!rabbitmqChannel)
+      throw new Error("RabbitMQ channel is not established.");
     rabbitmqChannel.consume(
       queueName,
       async (message) => {
@@ -68,15 +75,15 @@ async function consumeFromQueue() {
   }
 }
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT received. Closing RabbitMQ connection.');
+process.on("SIGINT", async () => {
+  console.log("SIGINT received. Closing RabbitMQ connection.");
   if (rabbitmqChannel) await rabbitmqChannel.close();
   if (rabbitmqConnection) await rabbitmqConnection.close();
   process.exit(0);
 });
 
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received. Closing RabbitMQ connection.');
+process.on("SIGTERM", async () => {
+  console.log("SIGTERM received. Closing RabbitMQ connection.");
   if (rabbitmqChannel) await rabbitmqChannel.close();
   if (rabbitmqConnection) await rabbitmqConnection.close();
   process.exit(0);

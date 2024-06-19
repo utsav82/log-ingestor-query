@@ -11,12 +11,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-  res.send("Log Ingestor API");
+app.get("/test", (req, res) => {
+  console.log("test")
+  res.send("test");
 });
 
 app.use("/log", logsRouter);
-
 
 connectToRabbitMQ();
 
