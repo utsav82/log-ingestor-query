@@ -22,6 +22,7 @@ This project implements a log ingestor and a query interface in Node.js using an
 
 - **Node.js and Express Server:**
   - Handles incoming requests and manages responses.
+
 - **RabbitMQ Message Queue:**
 
   - Logs are forwarded to a message queue upon receipt.
@@ -41,11 +42,11 @@ This project implements a log ingestor and a query interface in Node.js using an
 
 ### Using HTML Form
 
-Access the HTML form at [http://localhost:3000/](http://localhost:3000/) to conveniently input queries and retrieve results.
+Access the HTML form at [http://localhost:80/](http://localhost:3000/) to conveniently input queries and retrieve results.
 
 ### Using GET Requests
 
-Make GET requests to [http://localhost:3000/log](http://localhost:3000/log) with appropriate parameters to query the log data. You can use tools like Postman or Thunder Client for this purpose.
+Make GET requests to [http://localhost:80/log](http://localhost:3000/log) with appropriate parameters to query the log data. You can use tools like Postman or Thunder Client for this purpose.
 
 Example GET request parameters:
 
@@ -85,7 +86,7 @@ Adjust the parameters based on the specific log attributes you want to filter or
 ### Query Interface
 
 - **HTML Form:**
-  - Implemented at `localhost:3000/` for user-friendly interaction.
+  - Implemented at `localhost:80/` for user-friendly interaction.
 
 ### Docker and Docker Compose
 
@@ -113,16 +114,16 @@ To run the log ingestor and query interface, you need Docker installed on your s
 2. **Start the containers:**
 
    ```bash
-   docker-compose up -d --scale log-ingestor=2
+   docker-compose up -d --scale node-server=2
    ```
 
-   This command starts all the necessary containers. The `-d` flag runs the containers in the background, and `--scale log-ingestor=2` scales the log-ingestor service to two instances.
+   This command starts all the necessary containers. The `-d` flag runs the containers in the background, and `--scale node-server=2` scales the log-ingestor node servers to two instances.
 
 3. **Wait for the containers to be ready:**
    While the containers are starting up, the Node.js app connects to the database and RabbitMQ. You can verify their status by checking the logs using Docker Desktop or running the following command for each instance:
 
    ```bash
-   docker logs -f log-ingestor-query-log-ingestor-1
+   docker logs -f log-ingestor-query-node-server-1
    ```
 
    Replace `1` with `2` for the second instance.
@@ -134,7 +135,7 @@ To run the log ingestor and query interface, you need Docker installed on your s
    - **HTTP Requests:**
      - Make HTTP POST requests to the `/log` endpoint to submit logs.
      - Use HTTP GET requests at the same endpoint with various query parameters to retrieve logs.
-     - Example GET request: `http://localhost:3000/log?level=error`
+     - Example GET request: `http://localhost:80/log?level=error`
      - Experiment with different query parameters based on log attributes.
 
    ![image](public/post.png)
@@ -142,7 +143,7 @@ To run the log ingestor and query interface, you need Docker installed on your s
 
    - **Web UI:**
 
-     - Access the web UI at [http://localhost:3000](http://localhost:3000) in your browser.
+     - Access the web UI at [http://localhost:80](http://localhost:80) in your browser.
      - Enter log details for queries in the user-friendly interface.
 
        ![image](public/browser.png)
@@ -165,13 +166,14 @@ To run the log ingestor and query interface, you need Docker installed on your s
 ### Container Startup Dependencies
 
 - There might be instances where the Node.js container starts before the RabbitMQ or MongoDB containers are fully up. In such cases, the Node.js app may encounter connection issues.
+
 - **Mitigation:**
 
   - Proper error handling is implemented, and the Node.js app will retry connecting to the containers until they are ready.
   - Users are advised to wait for the containers to be up before interacting with the system. Check container logs for status verification:
 
     ```bash
-    docker logs -f log-ingestor-query-log-ingestor-1
+    docker logs -f log-ingestor-query-node-server-1
     ```
 
     Replace `1` with `2` for the second instance.
