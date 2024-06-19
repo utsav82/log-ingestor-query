@@ -62,38 +62,6 @@ Adjust the parameters based on the specific log attributes you want to filter or
   - Docker is used to manage different images and containers.
   - Docker Compose simplifies multi-container Docker applications.
 
-## Components and Technologies Used
-
-### Log Ingestor
-
-- **Node.js and Express Server:**
-  - Handles incoming requests and manages responses.
-- **RabbitMQ Message Queue:**
-
-  - Logs are forwarded to a message queue upon receipt.
-  - A subscriber consumes these logs and writes them to the database.
-
-- **MongoDB:**
-  - Efficiently manages vast amounts of log data.
-  - Timestamps are indexed to optimize write performance.
-
-### Load Balancing
-
-- **Nginx:**
-  - Load balances multiple Node.js servers to handle requests at scale.
-  - Distributes incoming requests to different instances of the Node.js app.
-
-### Query Interface
-
-- **HTML Form:**
-  - Implemented at `localhost:80/` for user-friendly interaction.
-
-### Docker and Docker Compose
-
-- **Containerization:**
-  - Docker is used to manage different images and containers.
-  - Docker Compose simplifies multi-container Docker applications.
-
 ## Project Setup
 
 ### Prerequisites
