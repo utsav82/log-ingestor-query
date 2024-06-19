@@ -12,10 +12,6 @@ This project implements a log ingestor system and a query interface. The system 
   - [Installation](#installation)
 - [Limitations and Known Issues](#limitations-and-known-issues)
 
-# Log Ingestor and Query Interface
-
-This project implements a log ingestor and a query interface in Node.js using an Express server.
-
 ## Components and Technologies Used
 
 ### Log Ingestor
