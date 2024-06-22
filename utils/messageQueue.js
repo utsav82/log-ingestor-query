@@ -1,22 +1,24 @@
 const amqp = require("amqplib");
-const rabbitmqUrl = "amqp://rabbitmq:5672";
-const queueName = "logQueue";
 const Log = require("../models/logModal");
+
+const { RABBITMQ_URL, QUEUE_NAME } = require("../config/config");
 const maxRetryTime = 30000; // 30 seconds
 let startTime;
 
 let rabbitmqConnection;
 let rabbitmqChannel;
 
-async function connectToRabbitMQ() {
+async function connectToRabbitMQ(from) {
   try {
-    rabbitmqConnection = await amqp.connect(rabbitmqUrl);
+    rabbitmqConnection = await amqp.connect(RABBITMQ_URL);
     rabbitmqChannel = await rabbitmqConnection.createChannel();
-    await rabbitmqChannel.assertQueue(queueName);
-    console.log("Connected to RabbitMQ");
-    console.log("Waiting for log entries...");
+    await rabbitmqChannel.assertQueue(QUEUE_NAME);
+    console.log("Connected to RabbitMQ from", from);
 
-    consumeFromQueue();
+    if (from === "ingestor") {
+      console.log("Waiting for log entries...");
+      consumeFromQueue();
+    }
   } catch (error) {
     if (!startTime) {
       startTime = Date.now();
@@ -26,7 +28,7 @@ async function connectToRabbitMQ() {
 
     if (elapsedTime < maxRetryTime) {
       console.log("Trying to connect to RabbitMQ");
-      setTimeout(connectToRabbitMQ, 5000);
+      setTimeout(connectToRabbitMQ, 5000, from);
     } else {
       console.error(
         `Unable to connect to RabbitMQ after ${maxRetryTime / 1000} seconds: ${
@@ -42,7 +44,7 @@ async function publishToQueue(logEntry) {
     if (!rabbitmqChannel)
       throw new Error("RabbitMQ channel is not established.");
     rabbitmqChannel.sendToQueue(
-      queueName,
+      QUEUE_NAME,
       Buffer.from(JSON.stringify(logEntry))
     );
     console.log(`Log entry sent to the queue`);
@@ -56,7 +58,7 @@ async function consumeFromQueue() {
     if (!rabbitmqChannel)
       throw new Error("RabbitMQ channel is not established.");
     rabbitmqChannel.consume(
-      queueName,
+      QUEUE_NAME,
       async (message) => {
         if (message !== null) {
           const logEntry = JSON.parse(message.content.toString());

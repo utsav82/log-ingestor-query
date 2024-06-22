@@ -18,7 +18,7 @@ app.get("/test", (req, res) => {
 
 app.use("/log", logsRouter);
 
-connectToRabbitMQ();
+connectToRabbitMQ("server");
 
 const port = process.env.PORT || 3000;
 

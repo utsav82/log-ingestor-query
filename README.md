@@ -17,7 +17,10 @@ This project implements a log ingestor system and a query interface. The system 
 ### Log Ingestor
 
 - **Node.js and Express Server:**
-  - Handles incoming requests and manages responses.
+
+  - Two separate services:
+    - **node-server:** Handles GET and POST requests, providing a query interface for logs. This service processes incoming requests, performs searches on the log data, and returns results to the client.
+    - **ingestor-service:** Writes log entries into the database by consuming messages from RabbitMQ. This service is responsible for receiving log data from the message queue and storing it efficiently in MongoDB.
 
 - **RabbitMQ Message Queue:**
 
@@ -42,13 +45,13 @@ Access the HTML form at [http://localhost:80/](http://localhost:3000/) to conven
 
 ### Using GET Requests
 
-Make GET requests to [http://localhost:80/log](http://localhost:3000/log) with appropriate parameters to query the log data. You can use tools like Postman or Thunder Client for this purpose.
+Make GET requests to [http://localhost:80/log](http://localhost:80/log) with appropriate parameters to query the log data. You can use tools like Postman or Thunder Client for this purpose.
 
 Example GET request parameters:
 
-- `http://localhost:3000/log?level=error`
-- `http://localhost:3000/log?message=Failed%20to%20connect`
-- `http://localhost:3000/log?resourceId=server-1234`
+- `http://localhost:80/log?level=error`
+- `http://localhost:80/log?message=Failed%20to%20connect`
+- `http://localhost:80/log?resourceId=server-1234`
 
 Adjust the parameters based on the specific log attributes you want to filter or search.
 
@@ -78,16 +81,20 @@ To run the log ingestor and query interface, you need Docker installed on your s
 2. **Start the containers:**
 
    ```bash
-   docker-compose up -d --scale node-server=2
+   docker-compose up -d --scale node-server=2 --scale ingestor-service=2
    ```
 
-   This command starts all the necessary containers. The `-d` flag runs the containers in the background, and `--scale node-server=2` scales the log-ingestor node servers to two instances.
+This command starts all the necessary containers. The -d flag runs the containers in the background. The --scale node-server=2 and --scale ingestor-service=2 options scale the Node.js servers and the log ingestor services to two instances each. You can adjust these values to suit your needs.
 
 3. **Wait for the containers to be ready:**
    While the containers are starting up, the Node.js app connects to the database and RabbitMQ. You can verify their status by checking the logs using Docker Desktop or running the following command for each instance:
 
    ```bash
    docker logs -f log-ingestor-query-node-server-1
+   ```
+
+   ```bash
+   docker logs -f log-ingestor-query-ingestor-service-1
    ```
 
    Replace `1` with `2` for the second instance.
@@ -136,17 +143,16 @@ To run the log ingestor and query interface, you need Docker installed on your s
   - Proper error handling is implemented, and the Node.js app will retry connecting to the containers until they are ready.
   - Users are advised to wait for the containers to be up before interacting with the system. Check container logs for status verification:
 
-    ```bash
-    docker logs -f log-ingestor-query-node-server-1
-    ```
+  ```bash
+  docker logs -f log-ingestor-query-node-server-1
+  ```
 
-    Replace `1` with `2` for the second instance.
+  ```bash
+  docker logs -f log-ingestor-query-ingestor-service-1
+  ```
 
-### Initial Request Delay
+  Replace `1` with `2` for the second instance.
 
-- In some cases, the first request to the server might experience an unexpected delay.
-- **Mitigation:**
-  - Subsequent requests work smoothly. Currently I am investigating the issue but it does not seem to happen so often.
 
 ## Troubleshooting
 
@@ -154,3 +160,4 @@ If you encounter any issues or have questions, consider the following steps:
 
 1. Check container logs for any error messages.
 2. Ensure all required containers (RabbitMQ, MongoDB) are running and fully initialized.
+3. Shut down and restart the service.
